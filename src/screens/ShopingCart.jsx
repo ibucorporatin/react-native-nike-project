@@ -1,4 +1,11 @@
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  FlatList,
+  Pressable,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { useSelector } from "react-redux";
 import CartListItem from "../components/CartListItem";
 import { ShopingCartTotal } from "../components/ShopingCartTotal";

@@ -1,20 +1,20 @@
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { selectNumberOfItem } from "../store/cartSlise";
 
-const CartIcon = () => {
+const CartIcon = ({ size, color }) => {
   const navigation = useNavigation();
   const cartItem = useSelector(selectNumberOfItem);
   return (
     <Pressable
-      style={styles.cartContainer}
+      style={[styles.cartContainer]}
       onPress={() => {
         navigation.navigate("cart");
       }}
     >
-      <FontAwesome5 name="shopping-cart" size={30} color="gray" />
+      <FontAwesome5 name="shopping-cart" size={size} color={color} />
       <Text style={styles.cartCount}>{cartItem}</Text>
     </Pressable>
   );
@@ -28,14 +28,17 @@ const styles = StyleSheet.create({
   },
   cartCount: {
     position: "absolute",
-    left: 12,
+    left: 9,
     top: 0,
     backgroundColor: "black",
     color: "white",
-    paddingHorizontal: 5,
-    paddingVertical: 1,
+    paddingHorizontal: 4,
+    paddingVertical: 0.5,
     borderRadius: 20,
-    fontSize: 13,
+    fontSize: 12,
+  },
+  pressed: {
+    opacity: 0.7,
   },
 });
 export default CartIcon;

@@ -1,3 +1,5 @@
+import { useNavigation } from "@react-navigation/native";
+import { useEffect, useLayoutEffect } from "react";
 import {
   FlatList,
   Image,
@@ -7,6 +9,7 @@ import {
   Text,
   useWindowDimensions,
   View,
+  StatusBar,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { cartSlice } from "../store/cartSlise";
@@ -15,6 +18,7 @@ import { cartSlice } from "../store/cartSlise";
 const ProductDetailsScreen = () => {
   const product = useSelector((state) => state.products.seleectedPrducts);
   const dispatch = useDispatch();
+  const navigation = useNavigation();
   //   const product = products[0];
   const { width } = useWindowDimensions();
 
@@ -22,42 +26,56 @@ const ProductDetailsScreen = () => {
     // console.warn("added in cart");
     dispatch(cartSlice.actions.addToCart({ product }));
   };
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: product.name,
+    });
+  }, [navigation, product.name]);
 
   //   console.log(product);
-  return (
-    <View>
-      <ScrollView>
-        {/* Image Carousel */}
 
-        <FlatList
-          data={product.images}
-          renderItem={({ item }) => {
-            return (
-              <Image
-                style={[styles.image, { width: width }]}
-                source={{ uri: item }}
-              />
-            );
+  return (
+    <>
+      <View>
+        <ScrollView>
+          {/* Image Carousel */}
+
+          <FlatList
+            data={product.images}
+            renderItem={({ item }) => {
+              return (
+                <Image
+                  style={[styles.image, { width: width }]}
+                  source={{ uri: item }}
+                />
+              );
+            }}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+          />
+          <View style={styles.productDetailContainer}>
+            {/* Title */}
+            <Text style={styles.title}>{product.name}</Text>
+            {/* Price */}
+            <Text style={styles.price}>{product.price}</Text>
+            {/* Description */}
+            <Text style={styles.description}>{product.description}</Text>
+          </View>
+        </ScrollView>
+        {/* Add to cart button */}
+        <Pressable
+          style={styles.button}
+          onPress={addToCart}
+          android_ripple={{
+            color: "white",
           }}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-        />
-        <View style={styles.productDetailContainer}>
-          {/* Title */}
-          <Text style={styles.title}>{product.name}</Text>
-          {/* Price */}
-          <Text style={styles.price}>{product.price}</Text>
-          {/* Description */}
-          <Text style={styles.description}>{product.description}</Text>
-        </View>
-      </ScrollView>
-      {/* Add to cart button */}
-      <Pressable style={styles.button} onPress={addToCart}>
-        <Text style={styles.buttonText}>Add to Cart</Text>
-      </Pressable>
-      {/* Navigation icon */}
-    </View>
+        >
+          <Text style={styles.buttonText}>Add to Cart</Text>
+        </Pressable>
+        {/* Navigation icon */}
+      </View>
+    </>
   );
 };
 

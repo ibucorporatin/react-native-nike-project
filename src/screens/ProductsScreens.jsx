@@ -6,6 +6,8 @@ import {
   StyleSheet,
   Text,
   View,
+  TouchableOpacity,
+  StatusBar,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { productsSlice } from "../store/productsSlice";
@@ -16,28 +18,30 @@ const ProductsScreens = () => {
   const products = useSelector((state) => state.products.products);
   const dispatch = useDispatch();
   return (
-    <FlatList
-      data={products}
-      renderItem={({ item }) => {
-        return (
-          <Pressable
-            style={styles.itemContainer}
-            onPress={() => {
-              dispatch(productsSlice.actions.setSelectedProducts(item.id));
-              navigation.navigate("product details");
-            }}
-          >
-            <Image
-              source={{
-                uri: item.image,
+    <>
+      <FlatList
+        data={products}
+        renderItem={({ item }) => {
+          return (
+            <TouchableOpacity
+              style={styles.itemContainer}
+              onPress={() => {
+                dispatch(productsSlice.actions.setSelectedProducts(item.id));
+                navigation.navigate("product details");
               }}
-              style={styles.image}
-            />
-          </Pressable>
-        );
-      }}
-      numColumns={2}
-    />
+            >
+              <Image
+                source={{
+                  uri: item.image,
+                }}
+                style={styles.image}
+              />
+            </TouchableOpacity>
+          );
+        }}
+        numColumns={2}
+      />
+    </>
   );
 };
 const styles = StyleSheet.create({

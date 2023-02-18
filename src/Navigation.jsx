@@ -14,20 +14,35 @@ const Navigation = () => {
         screenOptions={{ contentStyle: { backgroundColor: "white" } }}
       >
         <Stack.Screen
-          options={{ headerRight: CartIcon }}
           name="products"
+          options={{
+            headerStyle: { backgroundColor: "black" },
+            headerTintColor: "white",
+            headerRight: CartIcon,
+            statusBarStyle: "dark",
+            statusBarColor: "white",
+          }}
           component={ProductsScreens}
         />
         <Stack.Screen
           name="product details"
           options={{
-            presentation: "modal",
+            headerStyle: { backgroundColor: "black" },
+            headerTintColor: "white",
             headerRight: CartIcon,
+            statusBarStyle: "dark",
+            statusBarColor: "white",
           }}
           component={ProductDetailsScreen}
         />
         <Stack.Screen
-          options={{ headerRight: CartIcon }}
+          options={{
+            headerStyle: { backgroundColor: "black" },
+            headerTintColor: "white",
+            headerRight: CartIcon,
+            statusBarStyle: "dark",
+            statusBarColor: "white",
+          }}
           name="cart"
           component={ShopingCart}
         />
