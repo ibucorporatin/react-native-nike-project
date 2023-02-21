@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import {
   Button,
   Pressable,
@@ -8,14 +8,17 @@ import {
   Text,
   ImageBackground,
   Image,
+  Alert,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { authenticate, authSlice } from "../store/authSlice";
+import { useDispatch } from "react-redux";
 // import Parse from "parse/react-native";
 const schema = yup
   .object({
-    username: yup.string().required("username is required"),
+    email: yup.string().email().required("email is required"),
     password: yup
       .string()
       .min(6, "it should be more than 6 character")
@@ -33,17 +36,33 @@ const LoginForm = ({ navigation, route }) => {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      username: route.params ? route.params.name : "",
-      password: route.params ? route.params.password : "",
+      email: "",
+      password: "",
     },
     resolver: yupResolver(schema),
   });
 
+  const dispatch = useDispatch();
+  // if (
+  //   route &&
+  //   route.params &&
+  //   route.params.from &&
+  //   route.params.from === "cart"
+  // ) {
+  //   Alert.alert(route.params.message1, route.params.message2);
+  // }
+
+  if (route.name === "cart") {
+    Alert.alert(
+      "Login is needed",
+      "authentication is needed to use cart feauture"
+    );
+  }
   const formSubmit = (data) => {
-    console.log(data);
-    // navigation.navigate("profile", data);
+    // console.log(data);
+
+    dispatch(authenticate({ data, mode: "signin" }));
   };
-  console.log(route);
 
   return (
     <>
@@ -54,13 +73,13 @@ const LoginForm = ({ navigation, route }) => {
           resizeMode="cover"
         >
           <Image
-          style={styles.Logo}
+            style={styles.Logo}
             source={require("../data/images/pngegg.png")}
           />
           <View style={styles.formContainer}>
             <Controller
               control={control}
-              name="username"
+              name="email"
               // rules={{ required: "username is required" }}
               render={({
                 field: { value, onChange, onBlur },
@@ -74,7 +93,7 @@ const LoginForm = ({ navigation, route }) => {
                       styles.input,
                       { borderColor: error ? "red" : "black" },
                     ]}
-                    placeholder={"Username"}
+                    placeholder={"user email"}
                     autoCapitalize={"none"}
                     onBlur={onBlur}
                   />
@@ -131,9 +150,7 @@ const LoginForm = ({ navigation, route }) => {
                     paddingTop: 7,
                   }}
                   onPress={() => {
-                    navigation.navigate("register", {
-                      name: "mohamed from login",
-                    });
+                    navigation.navigate("register");
                   }}
                 >
                   register

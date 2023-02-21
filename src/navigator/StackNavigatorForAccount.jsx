@@ -2,11 +2,12 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ProductDetailsScreen from "../screens/ProductDetailsScreen";
 import ProductsScreens from "../screens/ProductsScreens";
-import Header from "./Header";
+import Header from "../components/Header";
 
 // import CartIcon from "./components/CartIcon";
-import LoginForm from "./LoginForm";
-import Register from "./Register";
+import LoginForm from "../components/LoginForm";
+import Register from "../components/Register";
+import HeaderWithoutSearch from "../components/HeaderWithoutSearch";
 
 const Stack = createNativeStackNavigator();
 const StackNavigatorForAccount = () => {
@@ -22,7 +23,7 @@ const StackNavigatorForAccount = () => {
           //   headerRight: CartIcon,
           statusBarStyle: "dark",
           statusBarColor: "white",
-          header:()=><Header/>
+          header: () => <HeaderWithoutSearch />,
         }}
         component={LoginForm}
       />
@@ -34,7 +35,7 @@ const StackNavigatorForAccount = () => {
           //   headerRight: CartIcon,
           statusBarStyle: "dark",
           statusBarColor: "white",
-          header:()=><Header/>
+          header: () => <HeaderWithoutSearch />,
         }}
         component={Register}
       />

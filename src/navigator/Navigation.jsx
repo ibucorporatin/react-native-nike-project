@@ -1,11 +1,11 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Text } from "react-native";
-import CartIcon from "./components/CartIcon";
-import FavIcon from "./components/FavIcon";
-import ProductDetailsScreen from "./screens/ProductDetailsScreen";
-import ProductsScreens from "./screens/ProductsScreens";
-import ShopingCart from "./screens/ShopingCart";
+import CartIcon from "../components/CartIcon";
+import FavIcon from "../components/FavIcon";
+import ProductDetailsScreen from "../screens/ProductDetailsScreen";
+import ProductsScreens from "../screens/ProductsScreens";
+import ShopingCart from "../screens/ShopingCart";
 
 const Stack = createNativeStackNavigator();
 const Navigation = () => {

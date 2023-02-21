@@ -3,13 +3,13 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Text } from "react-native";
 import ProductDetailsScreen from "../screens/ProductDetailsScreen";
 import ProductsScreens from "../screens/ProductsScreens";
-import CartIcon from "./CartIcon";
-import FavIcon from "./FavIcon";
-import Header from "./Header";
+import CartIcon from "../components/CartIcon";
+import FavIcon from "../components/FavIcon";
+import Header from "../components/Header";
 
 // import CartIcon from "./components/CartIcon";
-import LoginForm from "./LoginForm";
-import Register from "./Register";
+import LoginForm from "../components/LoginForm";
+import Register from "../components/Register";
 
 const Stack = createNativeStackNavigator();
 const ProductStackNavigator = () => {
@@ -22,13 +22,12 @@ const ProductStackNavigator = () => {
         options={{
           headerStyle: { backgroundColor: "black" },
           headerTintColor: "white",
-            headerLeft: FavIcon,
+          headerLeft: FavIcon,
           statusBarStyle: "dark",
           statusBarColor: "white",
-        //  headerRight:()=>(<Text>shelloS</Text>)
+          //  headerRight:()=>(<Text>shelloS</Text>)
           // title:<Text>w</Text>
-          header:()=><Header/>
-          
+          header: () => <Header />,
         }}
         component={ProductsScreens}
       />

@@ -1,6 +1,6 @@
 import { Image, View } from "react-native";
 
-function NoTFound() {
+function EmptyCart() {
   return (
     <View
       style={{
@@ -13,11 +13,11 @@ function NoTFound() {
       <Image
         style={{ width: "50%", aspectRatio: 1, borderRadius: 10 }}
         source={{
-          uri: "https://cdn.dribbble.com/userupload/2905353/file/original-2022966da1fc3718d3feddfdc471ae47.png?compress=1&resize=400x300&vertical=top",
+          uri: "https://mir-s3-cdn-cf.behance.net/projects/404/95974e121862329.Y3JvcCw5MjIsNzIxLDAsMTM5.png",
         }}
       />
     </View>
   );
 }
 
-export default NoTFound;
+export default EmptyCart;

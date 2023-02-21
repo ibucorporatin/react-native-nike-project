@@ -1,9 +1,9 @@
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { NavigationContainer } from "@react-navigation/native";
 import { StatusBar, Text, View } from "react-native";
-import ProductDetailsScreen from "./screens/ProductDetailsScreen";
-import ProductsScreens from "./screens/ProductsScreens";
-import ShopingCart from "./screens/ShopingCart";
+import ProductDetailsScreen from "../screens/ProductDetailsScreen";
+import ProductsScreens from "../screens/ProductsScreens";
+import ShopingCart from "../screens/ShopingCart";
 import { Ionicons } from "@expo/vector-icons";
 const Drawer = createDrawerNavigator();
 function DrawerNavigatior() {

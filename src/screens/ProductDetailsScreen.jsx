@@ -12,19 +12,29 @@ import {
   StatusBar,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
+import { isAuthenticated } from "../store/authSlice";
 import { cartSlice } from "../store/cartSlise";
 // import products from "../data/products";
 
 const ProductDetailsScreen = () => {
   const product = useSelector((state) => state.products.seleectedPrducts);
+  const authenticated = useSelector(isAuthenticated);
   const dispatch = useDispatch();
   const navigation = useNavigation();
   //   const product = products[0];
   const { width } = useWindowDimensions();
 
   const addToCart = () => {
-    // console.warn("added in cart");
-    dispatch(cartSlice.actions.addToCart({ product }));
+    // console.warn(authenticated);
+    if (authenticated) {
+      dispatch(cartSlice.actions.addToCart({ product }));
+    } else {
+      // navigation.reset({
+      //   index: 0,
+      //   routes: [{ name: "login" }],
+      // });
+      navigation.navigate("login");
+    }
   };
   useLayoutEffect(() => {
     navigation.setOptions({
