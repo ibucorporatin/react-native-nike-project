@@ -54,7 +54,7 @@ const LoginForm = ({ navigation, route }) => {
           resizeMode="cover"
         >
           <Image
-            style={styles.Logo}
+          style={styles.Logo}
             source={require("../data/images/pngegg.png")}
           />
           <View style={styles.formContainer}>
@@ -221,8 +221,8 @@ const styles = StyleSheet.create({
     borderColor: "black",
   },
   Logo: {
-    width: 200,
-    height: 150,
+    width: 190,
+    height: 100,
     marginBottom: 20,
   },
   buttonViewContainer: {

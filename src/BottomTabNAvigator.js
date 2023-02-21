@@ -8,6 +8,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import StackNavigatorForAccount from "./components/StackNavigatorForAccount";
 import ProductStackNavigator from "./components/ProductStackNavigator";
 import CartIcon from "./components/CartIcon";
+import Header from "./components/Header";
 
 const BottomTop = createBottomTabNavigator();
 function BottomTabNAvigator() {
@@ -55,7 +56,9 @@ function BottomTabNAvigator() {
               tabBarIcon: ({ color, size }) => (
                 <CartIcon size={size} color={color} />
               ),
+              header:()=><Header/>
             }}
+            
           />
         </BottomTop.Navigator>
       </NavigationContainer>

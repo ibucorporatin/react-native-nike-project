@@ -2,6 +2,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Text } from "react-native";
 import CartIcon from "./components/CartIcon";
+import FavIcon from "./components/FavIcon";
 import ProductDetailsScreen from "./screens/ProductDetailsScreen";
 import ProductsScreens from "./screens/ProductsScreens";
 import ShopingCart from "./screens/ShopingCart";
@@ -18,7 +19,7 @@ const Navigation = () => {
           options={{
             headerStyle: { backgroundColor: "black" },
             headerTintColor: "white",
-            headerRight: CartIcon,
+            headerRight: FavIcon,
             statusBarStyle: "dark",
             statusBarColor: "white",
           }}
