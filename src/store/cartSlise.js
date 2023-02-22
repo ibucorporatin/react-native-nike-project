@@ -35,7 +35,6 @@ export const cartSlice = createSlice({
     //   }
     // },
     changeQuantity: (state, action) => {
-      // console.log(action.payload);
       const cartItem = state.item.find((item) => {
         return item.product.id === action.payload.productId;
       });

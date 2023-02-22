@@ -1,64 +1,69 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   createAsyncThunk,
   createSelector,
   createSlice,
 } from "@reduxjs/toolkit";
 import axios from "axios";
-import { login } from "../util/auth";
+import { createUser, login } from "../util/auth";
 
 const initialState = {
-  token: false,
+  token: null,
   authenticated: false,
   email: "",
+  login: {
+    errorMessage: "",
+  },
+  register: {
+    errorMessage: "",
+  },
+  authenticating: false,
 };
 
 export const authenticate = createAsyncThunk(
   "auth/authenticate",
-  async (value) => {
+  async (value, { rejectWithValue, dispatch }) => {
     const { data, mode } = value;
     const { email, password } = data;
     if (mode == "signin") {
       try {
-        return axios
-          .post(
-            "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCgpXJpXRj__N1vxZ0KjZDpQAB67B81t-A",
-            {
-              email,
-              password,
-              returnSecureToken: true,
-            }
-          )
-          .then((response) => response.data)
-          .catch((err) => console.log(err));
+        const response = await login(email, password);
+
+        return response.data;
       } catch (error) {
-        console.log("error");
+        if (axios.isAxiosError(error) && error.response) {
+          // console.log(error.response.data.error.message);
+          console.log("error");
+          dispatch(
+            authSlice.actions.setLoginErrorMessage(
+              error.response.data.error.message
+            )
+          );
+          return rejectWithValue(error.response.data);
+        }
       }
-    } else {
-      console.log("register");
+    } else if (mode == "register") {
+      console.log("registering");
+      try {
+        const response = await createUser(email, password);
+
+        return response.data;
+        // setTimeout(() => {
+        //   state.authenticating = false;
+        // }, 5000);
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+          console.log("error");
+          dispatch(
+            authSlice.actions.setRegisterErrorMessage(
+              error.response.data.error.message
+            )
+          );
+
+          return rejectWithValue(error.response.data);
+        }
+      }
     }
-    // return axios
-    // .post(
-    //   "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCgpXJpXRj__N1vxZ0KjZDpQAB67B81t-A",
-    //   {
-    //     email,
-    //     password,
-    //     returnSecureToken: true,
-    //   }
-    // )
-    // .then((response) => response.data)
-    // .catch((err) => console.log(err));
-    //     return axios
-    //       .post(
-    //         "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCgpXJpXRj__N1vxZ0KjZDpQAB67B81t-A",
-    //         {
-    //           name: "ssss",
-    //           email: "aibumohamed2001@gmail.com",
-    //           password: "abcdefgh",
-    //           returnSecureToken: true,
-    //         }
-    //       )
-    //       .then((response) => response.data)
-    //       .catch((err) => console.log(err));
   }
 );
 
@@ -66,32 +71,52 @@ export const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    // authenticate: (state, action) => {
-    //   state.token = "sdasdasd";
-    // },
-    // logout: (state, action) => {
-    //   // console.log(action.payload);
-    //   const cartItem = state.item.find((item) => {
-    //     return item.product.id === action.payload.productId;
-    //   });
-    //   cartItem.quantity += action.payload.amount;
-    //   if (cartItem.quantity <= 0) {
-    //     state.item = state.item.filter(
-    //       (produvtItem) => produvtItem !== cartItem
-    //     );
-    //   }
-    // },
+    logout: (state, action) => {
+      state.token = null;
+      state.email = "";
+      AsyncStorage.removeItem("user");
+    },
+    restoreUser: (state, action) => {
+      // console.log(action);
+      const data = action.payload;
+      state.token = data.token;
+      state.email = data.email;
+    },
+    setLoginErrorMessage: (state, action) => {
+      state.login.errorMessage = action.payload;
+    },
+    setRegisterErrorMessage: (state, action) => {
+      state.register.errorMessage = action.payload;
+    },
+    removeRegisterErrorMessage: (state, action) => {
+      state.register.errorMessage = "";
+    },
+    removeLoginErrorMessage: (state, action) => {
+      state.login.errorMessage = "";
+    },
   },
   extraReducers: (buider) => {
     buider.addCase(authenticate.pending, (state) => {
       console.log("pending");
+      state.authenticating = true;
     });
     buider.addCase(authenticate.fulfilled, (state, action) => {
-      //   console.log("success");
-      console.log(action.payload, "from mmmm");
+      const data = action.payload;
+      state.token = data.idToken;
+      state.email = data.email;
+
+      AsyncStorage.setItem(
+        "user",
+        JSON.stringify({ token: data.idToken, email: data.email })
+      );
+      console.log("work success");
+      state.authenticating = false;
     });
     buider.addCase(authenticate.rejected, (state, action) => {
-      console.log("error why");
+      // console.log(action.payload.error.message);
+
+      console.log("reject");
+      state.authenticating = false;
     });
   },
 });
@@ -99,21 +124,17 @@ export const authSlice = createSlice({
 export const isAuthenticated = (state) => {
   return state.auth.token ? !!state.auth.token : false;
 };
-
-export const subTotal = (state) => {
-  return state.cart.item.reduce(
-    (sum, cartItem) => sum + cartItem.product.price * cartItem.quantity,
-    0
-  );
+export const loginErrorMessage = (state) => {
+  return state.auth.login.errorMessage;
+};
+export const registerErrorMessage = (state) => {
+  return state.auth.register.errorMessage;
 };
 
-export const cart = (state) => state.cart;
-export const selectDeleveryPrice = createSelector(subTotal, cart, (sub, cart) =>
-  sub >= cart.freeDeliveryFrom ? 0 : sub === 0 ? 0 : cart.deliveryFee
-);
+export const userEmail = (state) => {
+  return state.auth.email;
+};
 
-export const total = createSelector(
-  subTotal,
-  selectDeleveryPrice,
-  (sub, del) => sub + del
-);
+export const authenticating = (state) => {
+  return state.auth.authenticating;
+};

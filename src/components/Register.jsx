@@ -9,45 +9,58 @@ import {
   ImageBackground,
   Image,
   ScrollView,
+  Modal,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import {
+  authenticate,
+  authenticating,
+  authSlice,
+  registerErrorMessage,
+} from "../store/authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import LoadingOverlay from "./LoadingOverlay";
 // import Parse from "parse/react-native";
 const schema = yup
   .object({
-    firstname: yup.string().required("firstname is required"),
-    lastname: yup.string().required("lastname is required"),
-    email: yup.string().email().required("email is required"),
-    password: yup
+    email: yup.string().email().required(),
+
+    password: yup.string().min(6).required(),
+    confirmPassword: yup
       .string()
-      .required("username is required")
-      .min(6, "it should be more than 6 character")
-      .max(11, "it should be less than 11 character"),
+      .oneOf([yup.ref("password"), null], "Passwords must match")
+      .required(),
   })
   .required();
 const image = {
   uri: "https://images.unsplash.com/photo-1605348532760-6753d2c43329?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8bmlrZSUyMHNob2VzfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60",
 };
 const Register = ({ navigation }) => {
+  const dispatch = useDispatch();
+  const authError = useSelector(registerErrorMessage);
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm({
-    defaultValues: {
-      username: "",
-      password: "",
-    },
     resolver: yupResolver(schema),
   });
-
+  const loading = useSelector(authenticating);
   const formSubmit = (data) => {
     // console.log(data);
+    dispatch(authenticate({ data, mode: "register" }));
+  };
+  const removeError = () => {
+    dispatch(authSlice.actions.removeRegisterErrorMessage());
   };
 
   return (
     <>
+      <Modal visible={loading}>
+        <LoadingOverlay message="into rigistering..." />
+      </Modal>
       <View style={styles.container}>
         <ImageBackground
           style={styles.imageStyle}
@@ -59,58 +72,7 @@ const Register = ({ navigation }) => {
             source={require("../data/images/pngegg.png")}
           />
           <View style={styles.formContainer}>
-            <Controller
-              control={control}
-              name="firstname"
-              // rules={{ required: "username is required" }}
-              render={({
-                field: { value, onChange, onBlur },
-                fieldState: { error },
-              }) => (
-                <View>
-                  <TextInput
-                    onChangeText={onChange}
-                    value={value}
-                    style={[
-                      styles.input,
-                      { borderColor: error ? "red" : "black" },
-                    ]}
-                    placeholder={"firstname"}
-                    autoCapitalize={"none"}
-                    onBlur={onBlur}
-                  />
-                  {error && (
-                    <Text style={styles.errorMessage}>{error.message}</Text>
-                  )}
-                </View>
-              )}
-            />
-            <Controller
-              control={control}
-              name="lastname"
-              // rules={{ required: "username is required" }}
-              render={({
-                field: { value, onChange, onBlur },
-                fieldState: { error },
-              }) => (
-                <View>
-                  <TextInput
-                    onChangeText={onChange}
-                    value={value}
-                    style={[
-                      styles.input,
-                      { borderColor: error ? "red" : "black" },
-                    ]}
-                    placeholder={"lastname"}
-                    autoCapitalize={"none"}
-                    onBlur={onBlur}
-                  />
-                  {error && (
-                    <Text style={styles.errorMessage}>{error.message}</Text>
-                  )}
-                </View>
-              )}
-            />
+            {authError && <Text style={styles.errorMessage}>{authError}</Text>}
             <Controller
               control={control}
               name="email"
@@ -121,7 +83,10 @@ const Register = ({ navigation }) => {
               }) => (
                 <View>
                   <TextInput
-                    onChangeText={onChange}
+                    onChangeText={(e) => {
+                      onChange(e);
+                      authError && removeError();
+                    }}
                     value={value}
                     style={[
                       styles.input,
@@ -137,9 +102,68 @@ const Register = ({ navigation }) => {
                 </View>
               )}
             />
+            {/* <Controller
+              control={control}
+              name="confirmEmail"
+              // rules={{ required: "username is required" }}
+              render={({
+                field: { value, onChange, onBlur },
+                fieldState: { error },
+              }) => (
+                <View>
+                  <TextInput
+                    onChangeText={(e) => {
+                      onChange(e);
+                      authError && removeError();
+                    }}
+                    value={value}
+                    style={[
+                      styles.input,
+                      { borderColor: error ? "red" : "black" },
+                    ]}
+                    placeholder={"confirmEmail"}
+                    autoCapitalize={"none"}
+                    onBlur={onBlur}
+                  />
+                  {error && (
+                    <Text style={styles.errorMessage}>{error.message}</Text>
+                  )}
+                </View>
+              )}
+            /> */}
             <Controller
               control={control}
               name="password"
+              // rules={{ required: "username is required" }}
+              render={({
+                field: { value, onChange, onBlur },
+                fieldState: { error },
+              }) => (
+                <View>
+                  <TextInput
+                    onChangeText={(e) => {
+                      onChange(e);
+                      authError && removeError();
+                    }}
+                    value={value}
+                    style={[
+                      styles.input,
+                      { borderColor: error ? "red" : "black" },
+                    ]}
+                    placeholder={"password"}
+                    autoCapitalize={"none"}
+                    onBlur={onBlur}
+                    secureTextEntry={true}
+                  />
+                  {error && (
+                    <Text style={styles.errorMessage}>{error.message}</Text>
+                  )}
+                </View>
+              )}
+            />
+            <Controller
+              control={control}
+              name="confirmPassword"
               // rules={{ required: "passwoed is required" }}
               render={({
                 field: { value, onChange, onBlur },
@@ -147,13 +171,16 @@ const Register = ({ navigation }) => {
               }) => (
                 <View>
                   <TextInput
-                    onChangeText={onChange}
+                    onChangeText={(e) => {
+                      onChange(e);
+                      authError && removeError();
+                    }}
                     value={value}
                     style={[
                       styles.input,
                       { borderColor: error ? "red" : "black" },
                     ]}
-                    placeholder={"passwoed"}
+                    placeholder={"confirmPassword"}
                     autoCapitalize={"none"}
                     onBlur={onBlur}
                     secureTextEntry={true}

@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import {
   Button,
   Pressable,
@@ -9,16 +9,24 @@ import {
   ImageBackground,
   Image,
   Alert,
+  Modal,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { authenticate, authSlice } from "../store/authSlice";
-import { useDispatch } from "react-redux";
+import {
+  authenticate,
+  authenticating,
+  authSlice,
+  loginErrorMessage,
+} from "../store/authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import Header from "./Header";
+import LoadingOverlay from "./LoadingOverlay";
 // import Parse from "parse/react-native";
 const schema = yup
   .object({
-    email: yup.string().email().required("email is required"),
+    email: yup.string().email().trim().required("email is required"),
     password: yup
       .string()
       .min(6, "it should be more than 6 character")
@@ -29,7 +37,9 @@ const schema = yup
 const image = {
   uri: "https://images.unsplash.com/photo-1605348532760-6753d2c43329?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8bmlrZSUyMHNob2VzfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60",
 };
-const LoginForm = ({ navigation, route }) => {
+const LoginForm = ({ navigation }) => {
+  const authError = useSelector(loginErrorMessage);
+
   const {
     control,
     handleSubmit,
@@ -43,6 +53,7 @@ const LoginForm = ({ navigation, route }) => {
   });
 
   const dispatch = useDispatch();
+  const loading = useSelector(authenticating);
   // if (
   //   route &&
   //   route.params &&
@@ -52,20 +63,26 @@ const LoginForm = ({ navigation, route }) => {
   //   Alert.alert(route.params.message1, route.params.message2);
   // }
 
-  if (route.name === "cart") {
-    Alert.alert(
-      "Login is needed",
-      "authentication is needed to use cart feauture"
-    );
-  }
+  // if (route.name === "cart") {
+  //   Alert.alert(
+  //     "Login is needed",
+  //     "authentication is needed to use cart feauture"
+  //   );
+  // }
   const formSubmit = (data) => {
     // console.log(data);
 
     dispatch(authenticate({ data, mode: "signin" }));
   };
+  const removeError = () => {
+    dispatch(authSlice.actions.removeLoginErrorMessage());
+  };
 
   return (
     <>
+      <Modal visible={loading}>
+        <LoadingOverlay message="into signin..." />
+      </Modal>
       <View style={styles.container}>
         <ImageBackground
           style={styles.imageStyle}
@@ -77,6 +94,7 @@ const LoginForm = ({ navigation, route }) => {
             source={require("../data/images/pngegg.png")}
           />
           <View style={styles.formContainer}>
+            {authError && <Text style={styles.errorMessage}>{authError}</Text>}
             <Controller
               control={control}
               name="email"
@@ -87,7 +105,10 @@ const LoginForm = ({ navigation, route }) => {
               }) => (
                 <View>
                   <TextInput
-                    onChangeText={onChange}
+                    onChangeText={(e) => {
+                      onChange(e);
+                      authError && removeError();
+                    }}
                     value={value}
                     style={[
                       styles.input,
@@ -96,6 +117,7 @@ const LoginForm = ({ navigation, route }) => {
                     placeholder={"user email"}
                     autoCapitalize={"none"}
                     onBlur={onBlur}
+                    // onFocus={removeError}
                   />
                   {error && (
                     <Text style={styles.errorMessage}>{error.message}</Text>
@@ -113,7 +135,10 @@ const LoginForm = ({ navigation, route }) => {
               }) => (
                 <View>
                   <TextInput
-                    onChangeText={onChange}
+                    onChangeText={(e) => {
+                      onChange(e);
+                      authError && removeError();
+                    }}
                     value={value}
                     style={[
                       styles.input,
@@ -123,6 +148,7 @@ const LoginForm = ({ navigation, route }) => {
                     autoCapitalize={"none"}
                     onBlur={onBlur}
                     secureTextEntry={true}
+                    // onFocus={removeError}
                   />
                   {error && (
                     <Text style={styles.errorMessage}>{error.message}</Text>

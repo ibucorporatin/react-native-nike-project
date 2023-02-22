@@ -9,19 +9,35 @@ import StackNavigatorForAccount from "../StackNavigatorForAccount";
 import ProductStackNavigator from "../ProductStackNavigator";
 import CartIcon from "../../components/CartIcon";
 import Header from "../../components/Header";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { selectNumberOfItem } from "../../store/cartSlise";
 import EmptyCart from "../../components/EmptyCart";
 import HeaderWithoutSearch from "../../components/HeaderWithoutSearch";
-import { isAuthenticated } from "../../store/authSlice";
+import { authSlice, isAuthenticated } from "../../store/authSlice";
 import LoginForm from "../../components/LoginForm";
+import Profile from "../../components/Profile";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useEffect } from "react";
 
 const BottomTop = createBottomTabNavigator();
 
 function BottomTabNAvigator() {
   const cartCount = useSelector(selectNumberOfItem);
   const authenticated = useSelector(isAuthenticated);
-  console.log(authenticated);
+  // console.log(authenticated);
+  const dispatch = useDispatch();
+  // console.log(JSON.stringify(products));
+  useEffect(() => {
+    async function getToken() {
+      const user = await AsyncStorage.getItem("user");
+      if (user) {
+        const jsUser = JSON.parse(user);
+        // console.log(jsUser.token);
+        dispatch(authSlice.actions.restoreUser(jsUser));
+      }
+    }
+    getToken();
+  }, []);
   return (
     <>
       <NavigationContainer>
@@ -49,13 +65,14 @@ function BottomTabNAvigator() {
           /> */}
           <BottomTop.Screen
             name="accountPage"
-            component={authenticated ? Header : StackNavigatorForAccount}
+            component={authenticated ? Profile : StackNavigatorForAccount}
             options={{
               tabBarIcon: ({ color, size }) => (
                 <Ionicons name="person" color={color} size={size} />
               ),
               title: "account",
               headerShown: false,
+              // header: () => <HeaderWithoutSearch />,
             }}
           />
 
